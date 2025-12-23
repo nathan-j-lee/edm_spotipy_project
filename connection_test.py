@@ -48,13 +48,6 @@ def get_artist_tracks(artist_URL):
     #    print(f"name: {track} - popularity: {pop}")
 
     return track_names
-
-# sp_search = input("Search: ")
-# sp_URL = get_artist_URL(sp_search)
-# sp_tracks = get_artist_tracks(sp_URL)
-# for name in sp_tracks:
-#     print(name)
-
 # want to input a list of names, which should run above for each of the names and output a list of tracks per artist
 
 
@@ -86,5 +79,3 @@ for artist, tracks in test.items():
         for track in tracks:
             print(f' - {track}')
 
-#artist = get_artist_URL("NIUOAWHD")
-#get_artist_tracks(artist)
