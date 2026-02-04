@@ -2,6 +2,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 import os
+from tkinter_test import prompt_user
 
 # This looks for a .env file in the same directory and loads it
 load_dotenv()
@@ -50,26 +51,40 @@ def get_artist_tracks(artist_URL):
     return track_names
 # want to input a list of names, which should run above for each of the names and output a list of tracks per artist
 
-
-def get_artist_list():
-    #user_input = input("Enter multiple artists separated by commas:\n")
-    user_input = "Above & Beyond, AK SPORTS, AR/CO, Cera Khin, Clara Cuvé, Close Friends Only, Crankdat, CRAY, Discovery Project, GRAVAGERZ, Harristone, Hedex, John Summit, Kaysin, Kevin de Vries, Kobosil, Lucati, Madeon , Marie Nyx, MPH, Odymel, Pryda, Reza, Ship Wrek, Shlømo, SLANDER, southstar, Starjunk 95, Sub Focus, Techno Tupac, Wuki"
-    parsed_input = [name.strip() for name in user_input.split(',')]
+def get_artist_list(list):
+    print("Searching for artists on Spotify...")
+    #user_input = "Above & Beyond, AK SPORTS, AR/CO, Cera Khin, Clara Cuvé, Close Friends Only, Crankdat, CRAY, Discovery Project, GRAVAGERZ, Harristone, Hedex, John Summit, Kaysin, Kevin de Vries, Kobosil, Lucati, Madeon , Marie Nyx, MPH, Odymel, Pryda, Reza, Ship Wrek, Shlømo, SLANDER, southstar, Starjunk 95, Sub Focus, Techno Tupac, Wuki"
 
     artist_map = {}
 
     #print(parsed_input)
     # grab top tracks
 
-    for artist in parsed_input:
+    for artist in list:
         print(f"Looking for {artist}")
         artist_tracks = get_artist_tracks(get_artist_URL(artist))
 
         artist_map[artist] = artist_tracks
 
     return artist_map
-        
-test = get_artist_list()
+
+def read_files():
+    print("Reading files...")
+    # grab file from prompted user
+    filepath = prompt_user()
+
+    with open(filepath, 'r') as file:
+        # .read() gets the whole string, .splitlines() turns it into a list
+        artist_list = file.read().splitlines()
+
+    # Clean up any potential empty lines or extra spaces
+    artist_list = [name.strip() for name in artist_list if name.strip()]
+
+    return artist_list
+
+lineup_list = read_files()
+test = get_artist_list(lineup_list)
+print(test)
 
 for artist, tracks in test.items():
     print(f'Artist: {artist}')
