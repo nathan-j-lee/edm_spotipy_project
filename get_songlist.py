@@ -71,7 +71,7 @@ def get_artist_list(list):
 def read_files():
     print("Reading files...")
     # grab file from prompted user
-    filepath = prompt_user()
+    filepath = "text_files\Proper_Countdown_Day1.txt"
 
     with open(filepath, 'r') as file:
         # .read() gets the whole string, .splitlines() turns it into a list
@@ -82,15 +82,15 @@ def read_files():
 
     return artist_list
 
-lineup_list = read_files()
-test = get_artist_list(lineup_list)
-print(test)
+#lineup_list = read_files()
+#test = get_artist_list(lineup_list)
+#print(test)
 
-for artist, tracks in test.items():
-    print(f'Artist: {artist}')
-    if tracks == -1:
-        print(" Not found!")
-    else:
-        for track in tracks:
-            print(f' - {track}')
+#for artist, tracks in test.items():
+#    print(f'Artist: {artist}')
+#    if tracks == -1:
+#        print(" Not found!")
+#    else:
+#        for track in tracks:
+#            print(f' - {track}')
 
