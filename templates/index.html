@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>EDM Spotipy Project - Upload</title>
+    <title>EDM Spotipy Project - Lineup</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
@@ -17,7 +17,7 @@
     </div>
 
     <div class="container">
-        <h1>EDM Lineup Parser</h1>
+        <h1><a href="/" class="home-link">EDM Lineup Parser</a></h1>
 
         <div class="url-section">
             <h3>Input Lineup URL</h3>
@@ -31,20 +31,42 @@
         <div class="upload-section">
             <h3>Upload Artist List (.txt)</h3>
             <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
-                <input type="file" name="file" accept=".txt">
+                <input type="file" name="file" accept=".txt" required>
                 <button type="submit">Upload and Parse</button>
             </form>
         </div>
 
         {% if artists %}
+        <div class="lineup-actions">
+            <button id="filter-menu-btn" onclick="toggleFilterMenu()">🔍 Filter & Sort</button>
+            <div id="filter-menu">
+                <div class="menu-content">
+                    <span class="close-btn" onclick="toggleFilterMenu()">&times;</span>
+
+                    <h3>Sort By</h3>
+                    <select id="sort-select" onchange="sortArtists()">
+                        <option value="name">Name (A-Z)</option>
+                        <option value="name-rev">Name (Z-A)</option>
+                        <option value="popularity">Popularity (High-Low)</option>
+                    </select>
+
+                    <h3>Filter by Genre</h3>
+                    <div id="genre-filters">
+                        <button class="filter-btn active" onclick="filterGenre('all', this)">All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <h2>Lineup</h2>
         <div id="lineup-container">
             {% for artist in artists %}
-            <div class="artist-entry">
+            <div class="artist-entry" data-name="{{ artist.name }}" data-genres="{{ artist.genres|join(',') }}"
+                data-popularity="{{ artist.popularity }}">
+
                 <details ontoggle="fetchSongs(this, '{{ artist.name }}')">
                     <summary>
                         <span class="artist-name">{{ artist.name }}</span>
-
                         <div class="genre-container">
                             {% if artist.genres %}
                             {% for genre in artist.genres %}

@@ -1,73 +1,31 @@
+/* --- Base Styles & Dark Mode --- */
 body {
-    font-family: sans-serif;
-    margin: 40px;
-    line-height: 1.6;
-}
-
-.container {
-    max-width: 600px;
-    margin: auto;
-}
-
-/* ADDED: Styling for the URL section to match the upload section */
-.url-section, .upload-section {
-    background-color: #1e1e1e; /* Match the container depth */
-    border: 1px solid #333;    /* Subtle border instead of white box */
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    background: #eee;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 4px;
-}
-
-/* The overlay background */
-#loading-overlay {
-    position: fixed;
-    display: none;
-    /* Hidden by default */
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-    color: white;
-    text-align: center;
-    padding-top: 20%;
-    font-family: sans-serif;
-}
-
-/* General Page Background */
-body {
-    background-color: #121212; /* A soft, dark charcoal */
-    color: #e0e0e0;           /* Off-white text for better readability */
+    background-color: #121212;
+    color: #e0e0e0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
+    line-height: 1.6;
 }
 
 .container {
     max-width: 800px;
     margin: 50px auto;
-    background-color: #1e1e1e; /* Slightly lighter than the body to create depth */
+    background-color: #1e1e1e;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
-/* Make your input fields look good in dark mode too */
+/* --- Sections & Inputs --- */
+.url-section, .upload-section {
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
 input[type="url"], input[type="file"] {
     background-color: #2c2c2c;
     border: 1px solid #444;
@@ -76,7 +34,6 @@ input[type="url"], input[type="file"] {
     border-radius: 5px;
 }
 
-/* Spotify Green for buttons and accents */
 button {
     background-color: #1DB954;
     color: white;
@@ -85,89 +42,21 @@ button {
     border-radius: 20px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.2s;
 }
 
 button:hover {
     background-color: #1ed760;
 }
 
-/* Styling the artist entries */
+/* --- Artist Entries & Tracks --- */
 .artist-entry {
-    border-bottom: 1px solid #333;
-    padding: 15px 0;
-}
-
-summary {
-    font-size: 1.2rem;
-    cursor: pointer;
-    list-style: none; /* Removes default arrow in some browsers */
-}
-
-summary:hover {
-    color: #1DB954;
-}
-
-/* A simple CSS spinner */
-.spinner {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #1DB954;
-    /* Spotify Green */
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 2s linear infinite;
-    margin: 20px auto;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.artist-entry {
+    border: 1px solid #333;
     margin: 10px 0;
-    border: 1px solid #ddd;
     padding: 10px;
     border-radius: 5px;
 }
 
-summary {
-    font-weight: bold;
-    cursor: pointer;
-    color: #1DB954;
-}
-
-/* This is the container inside the <details> tag */
-.song-list {
-    background-color: #1a1a1a; /* Darker than the parent entry */
-    padding: 10px;
-    border-radius: 4px;
-    margin-top: 5px;
-}
-
-/* Target the list items specifically to remove that white/light box */
-.song-list li {
-    background-color: transparent !important; /* Forces removal of the light boxes in your screenshot */
-    color: #ffffff;      /* Bright white text for maximum readability */
-    padding: 10px;
-    margin-bottom: 2px;
-    border-bottom: 1px solid #333; /* Subtle separation */
-    list-style: none;    /* Removes bullet points */
-    font-size: 0.9rem;
-}
-
-/* Hover effect so you know which song you're looking at */
-.song-list li:hover {
-    background-color: #252525 !important;
-    color: #1DB954; /* Turns text Spotify Green on hover */
-}
-
-/* Align name and genres in the same line */
 summary {
     display: flex;
     justify-content: space-between;
@@ -175,18 +64,51 @@ summary {
     width: 100%;
     cursor: pointer;
     padding: 5px 0;
+    font-weight: bold;
+    list-style: none;
+}
+
+summary:hover .artist-name {
+    color: #1ed760;
 }
 
 .artist-name {
     font-size: 1.2rem;
-    font-weight: bold;
-    color: #1DB954; /* Spotify Green */
+    color: #1DB954;
     text-transform: uppercase;
 }
 
+.song-list {
+    background-color: #1a1a1a;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.song-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.song-list li {
+    background-color: transparent !important;
+    color: #ffffff;
+    padding: 10px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid #333;
+    font-size: 0.9rem;
+}
+
+.song-list li:hover {
+    background-color: #252525 !important;
+    color: #1DB954;
+}
+
+/* --- Badges --- */
 .genre-container {
     display: flex;
-    gap: 8px; /* Space between badges */
+    gap: 8px;
 }
 
 .genre-badge {
@@ -201,8 +123,169 @@ summary {
     white-space: nowrap;
 }
 
-/* For artists where Spotify has no genre data */
 .genre-badge.muted {
     border-color: #555;
     color: #888;
+}
+
+/* --- Loading Overlay --- */
+#loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #1DB954;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- Filter Menu (Modal) --- */
+#filter-menu-btn {
+    background-color: #2a2a2a;
+    color: #1DB954;
+    border: 1px solid #1DB954;
+    margin-bottom: 20px;
+}
+
+#filter-menu {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.85);
+    backdrop-filter: blur(5px);
+}
+
+#filter-menu.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-content {
+    background-color: #1e1e1e;
+    padding: 40px 30px 30px 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    border: 1px solid #333;
+}
+
+.close-btn {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 32px;
+    cursor: pointer;
+    color: #888;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #1DB954;
+}
+
+/* --- Genre Matrix Grid --- */
+#genre-filters {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns matrix */
+    gap: 10px;
+    padding-top: 15px;
+}
+
+.filter-btn {
+    width: 100%;
+    background-color: #2a2a2a;
+    color: #eee;
+    border: 1px solid #444;
+    padding: 10px 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s ease;
+}
+
+/* Alternating Colors */
+.filter-btn:nth-child(odd) {
+    border-color: #1DB954;
+    color: #1DB954;
+}
+
+.filter-btn:nth-child(even) {
+    border-color: #888;
+    color: #888;
+}
+
+.filter-btn:hover, 
+.filter-btn.active {
+    background-color: #1DB954 !important;
+    color: white !important;
+    border-color: #1DB954 !important;
+    transform: scale(1.03);
+}
+
+/* Sort dropdown styling */
+#sort-select {
+    background-color: #2c2c2c;
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+
+/* Styling the clickable title */
+.home-link {
+    text-decoration: none; /* Removes the underline */
+    color: #ffffff;        /* Keeps the title white */
+    transition: color 0.2s ease;
+}
+
+.home-link:hover {
+    color: #1DB954;        /* Turns Spotify Green on hover */
+}
+
+/* Ensure the H1 doesn't add weird spacing now that it has a link inside */
+h1 {
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+}
+
+
+/* Mobile Responsiveness for Grid */
+@media (max-width: 480px) {
+    #genre-filters {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }

@@ -35,7 +35,8 @@ def fetch_and_cache(artist_name):
         # Store all useful data in one dictionary
         data = {
             "url": artist['external_urls']['spotify'],
-            "genres": artist.get('genres', [])[:2]
+            "genres": artist.get('genres', [])[:2],
+            "popularity": artist.get('popularity', 0)
         }
         
         artist_cache[artist_name] = data

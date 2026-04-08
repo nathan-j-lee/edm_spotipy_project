@@ -56,15 +56,16 @@ def upload_file():
             # Clean up names from file
             raw_names = [name.strip() for name in content.replace('\n', ',').split(',') if name.strip()]
         
-        from get_songlist import get_artist_genres
+        from get_songlist import fetch_and_cache
 
         # Define a helper function to process a single artist
         def process_artist(name):
-            genres = get_artist_genres(name)
+            data = fetch_and_cache(name)
             time.sleep(0.1)
             return {
                 'name': name,
-                'genres': genres
+                'genres': data['genres'] if data else [],
+                'popularity': data['popularity'] if data else 0
             }
 
         # Threading Logic: max_workers=5 means 5 requests happen at once
@@ -77,16 +78,24 @@ def upload_file():
     return "List was empty"
 
 
-# Lazy load artist names rather than load every popular song
 @app.route('/get_songs/<artist_name>')
 def get_songs(artist_name):
-    # Wrap in a list because your function expects a list
-    result_map = get_artist_list([artist_name])
+    # Import the new cached functions
+    from get_songlist import get_artist_URL, get_artist_tracks
+
+    print(f"Fetching tracks for: {artist_name}") # Debugging line
     
-    # Extract the tracks for this specific artist
-    tracks = result_map.get(artist_name, [])
+    # 1. This now checks your 'artist_cache' dictionary first.
+    # Since you just uploaded the file, the URL is already in memory!
+    artist_url = get_artist_URL(artist_name)
     
-    # Return as JSON so the browser can read it without refreshing
+    # 2. Only fetch the tracks if we have a valid URL
+    if artist_url != -1:
+        tracks = get_artist_tracks(artist_url)
+    else:
+        tracks = []
+    
+    # Return as JSON for script.js to pick up
     return jsonify({"artist": artist_name, "tracks": tracks})
 
 
@@ -100,24 +109,25 @@ def scrape_from_url():
     if not url:
         return redirect(url_for('home'))
     
-    # 1. Get the raw list of names from Gemini
+    # 1. This is where raw_names is born (from your AI utility)
     raw_names = extract_lineup_with_ai(url)
     
-    from get_songlist import get_artist_genres
+    from get_songlist import fetch_and_cache
 
-    # 2. Reuse our helper for enrichment
+    # 2. Define the helper to fill the cache and get genres/popularity
     def process_artist(name):
-        genres = get_artist_genres(name)
+        data = fetch_and_cache(name)
         return {
             'name': name,
-            'genres': genres
+            'genres': data['genres'] if data else [],
+            'popularity': data['popularity'] if data else 0
         }
 
-    # 3. Use threading to fetch genres quickly
-    # Keeping max_workers at 5 to avoid those EDC rate limits!
+    # 3. Use Threading just like the upload route
     with ThreadPoolExecutor(max_workers=5) as executor:
         enriched_artists = list(executor.map(process_artist, raw_names))
 
+    # 4. Pass 'url' back so it stays in the input field if needed
     return render_template('index.html', artists=enriched_artists, url=url)
 
 if __name__ == '__main__':
