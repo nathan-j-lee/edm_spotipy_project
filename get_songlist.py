@@ -10,40 +10,58 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
 
 genre_cache = {}
+artist_cache = {}
 
-def get_artist_genres(artist_name):
-    # 1. Check if we already know this artist
-    if artist_name in genre_cache:
-        return genre_cache[artist_name]
+
+def fetch_and_cache(artist_name):
+    """
+    Checks the cache; if missing, calls Spotify once
+    and stores both URL and Genres.
+    """
+    # Check if we already have this exact artist in memory
+    if artist_name in artist_cache:
+        return artist_cache[artist_name]
 
     try:
         results = sp.search(q=f"artist:{artist_name}", type="artist", limit=1)
         items = results['artists']['items']
-        genres = items[0].get('genres', [])[:2] if items else []
+
+        if not items:
+            # Store None so we don't keep searching for a ghost
+            artist_cache[artist_name] = None
+            return None
+
+        artist = items[0]
+        # Store all useful data in one dictionary
+        data = {
+            "url": artist['external_urls']['spotify'],
+            "genres": artist.get('genres', [])[:2]
+        }
         
-        # 2. Save to cache so we don't hit the API again for this person
-        genre_cache[artist_name] = genres
-        return genres
+        artist_cache[artist_name] = data
+        return data
+
     except Exception as e:
-        # If we hit a rate limit (429), Spotipy usually handles the wait, 
-        # but returning an empty list keeps the app from crashing.
-        print(f"Error for {artist_name}: {e}")
-        return []
+        print(f"Spotify API Error for {artist_name}: {e}")
+        return None
+
+def get_artist_genres(artist_name):
+    """Uses the cache to return genres."""
+    data = fetch_and_cache(artist_name)
+    return data['genres'] if data else []
 
 def get_artist_URL(artist_name):
-    """Returns the Spotify URL for an artist."""
-    results = sp.search(q=f"artist:{artist_name}", type="artist", limit=1)
-    items = results['artists']['items']
-    if not items:
-        return -1
-    return items[0]['external_urls']['spotify']
+    """Uses the cache to return the URL."""
+    data = fetch_and_cache(artist_name)
+    return data['url'] if data else -1
 
-def get_artist_tracks(artist_URL):
-    """Returns top track names."""
-    if artist_URL == -1:
+def get_artist_tracks(artist_url):
+    """Fetches tracks using a URL (usually called via AJAX)."""
+    if not artist_url or artist_url == -1:
         return []
     try:
-        top_tracks = sp.artist_top_tracks(artist_URL, country='US')
+        # Note: Added country='US' for better results
+        top_tracks = sp.artist_top_tracks(artist_url, country='US')
         return [track['name'] for track in top_tracks['tracks']]
     except Exception as e:
         print(f"Error fetching tracks: {e}")
