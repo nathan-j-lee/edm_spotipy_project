@@ -1,7 +1,9 @@
+import time
+
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 from werkzeug.utils import secure_filename
-
+from concurrent.futures import ThreadPoolExecutor
 
 from get_songlist import get_artist_list
 from ai_utils import extract_lineup_with_ai
@@ -48,32 +50,31 @@ def upload_file():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        # Parse the file immediately after saving
-        artists = []
+        raw_names = []
         with open(filepath, 'r') as f:
             content = f.read()
-            # Replace newlines with commas so we can split everything at once
-            # This handles: "Artist A, Artist B" AND "Artist A\nArtist B"
-            raw_list = content.replace('\n', ',').split(',')
-            # Clean up whitespace and ignore empty entries
-            artists = [name.strip() for name in raw_list if name.strip()]
-        return render_template('index.html', artists=artists)
+            # Clean up names from file
+            raw_names = [name.strip() for name in content.replace('\n', ',').split(',') if name.strip()]
+        
+        from get_songlist import get_artist_genres
+
+        # Define a helper function to process a single artist
+        def process_artist(name):
+            genres = get_artist_genres(name)
+            time.sleep(0.1)
+            return {
+                'name': name,
+                'genres': genres
+            }
+
+        # Threading Logic: max_workers=5 means 5 requests happen at once
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            # .map maintains the order of the list
+            enriched_artists = list(executor.map(process_artist, raw_names))
+
+        return render_template('index.html', artists=enriched_artists)
+        
     return "List was empty"
-
-"""
-        # Start sending artists to Spotipy
-        if artists:
-            # Simple: Take first artist from list
-            #test_artist = artists[:1]
-
-            artist_map = get_artist_list(artists)
-
-            return render_template('index.html',
-                                   artist_map = artist_map,
-                                   filename = filename)
-"""
-    
-    
 
 
 # Lazy load artist names rather than load every popular song
@@ -89,16 +90,35 @@ def get_songs(artist_name):
     return jsonify({"artist": artist_name, "tracks": tracks})
 
 
-# Use Gemini to scrape lineup from given URL
+from concurrent.futures import ThreadPoolExecutor
+
+# ... (other routes) ...
+
 @app.route('/scrape', methods=['POST'])
 def scrape_from_url():
     url = request.form.get('lineup_url')
     if not url:
         return redirect(url_for('home'))
     
-    artists = extract_lineup_with_ai(url)
+    # 1. Get the raw list of names from Gemini
+    raw_names = extract_lineup_with_ai(url)
+    
+    from get_songlist import get_artist_genres
 
-    return render_template('index.html', artists=artists, url=url)
+    # 2. Reuse our helper for enrichment
+    def process_artist(name):
+        genres = get_artist_genres(name)
+        return {
+            'name': name,
+            'genres': genres
+        }
+
+    # 3. Use threading to fetch genres quickly
+    # Keeping max_workers at 5 to avoid those EDC rate limits!
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        enriched_artists = list(executor.map(process_artist, raw_names))
+
+    return render_template('index.html', artists=enriched_artists, url=url)
 
 if __name__ == '__main__':
     app.run(debug=True)

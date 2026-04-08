@@ -4,98 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>EDM Spotipy Project - Upload</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 40px;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: auto;
-        }
-
-        /* ADDED: Styling for the URL section to match the upload section */
-        .url-section,
-        .upload-section {
-            background: #f4f4f4;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            background: #eee;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        /* The overlay background */
-        #loading-overlay {
-            position: fixed;
-            display: none;
-            /* Hidden by default */
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            color: white;
-            text-align: center;
-            padding-top: 20%;
-            font-family: sans-serif;
-        }
-
-        /* A simple CSS spinner */
-        .spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #1DB954;
-            /* Spotify Green */
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 2s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .artist-entry {
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        summary {
-            font-weight: bold;
-            cursor: pointer;
-            color: #1DB954;
-        }
-
-        .song-list {
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 
 <body>
@@ -128,59 +38,33 @@
 
         {% if artists %}
         <h2>Lineup</h2>
-        {% for artist in artists %}
-        <div class="artist-entry">
-            <details ontoggle="fetchSongs(this, '{{ artist }}')">
-                <summary>{{ artist }}</summary>
-                <div class="song-list">
-                    <p>Loading tracks from Spotify...</p>
-                </div>
-            </details>
+        <div id="lineup-container">
+            {% for artist in artists %}
+            <div class="artist-entry">
+                <details ontoggle="fetchSongs(this, '{{ artist.name }}')">
+                    <summary>
+                        <span class="artist-name">{{ artist.name }}</span>
+
+                        <div class="genre-container">
+                            {% if artist.genres %}
+                            {% for genre in artist.genres %}
+                            <span class="genre-badge">{{ genre }}</span>
+                            {% endfor %}
+                            {% else %}
+                            <span class="genre-badge muted">Unknown Genre</span>
+                            {% endif %}
+                        </div>
+                    </summary>
+
+                    <div class="song-list">
+                        <p>Loading tracks from Spotify...</p>
+                    </div>
+                </details>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
         {% endif %}
     </div>
-
-    <script>
-        const overlay = document.getElementById('loading-overlay');
-        const uploadForm = document.getElementById('upload-form');
-        const scrapeForm = document.getElementById('scrape-form');
-
-        // ADDED: Listener for the Scrape form
-        scrapeForm.addEventListener('submit', function () {
-            overlay.style.display = 'block';
-        });
-
-        uploadForm.addEventListener('submit', function () {
-            overlay.style.display = 'block';
-        });
-
-        function fetchSongs(detailsElement, artistName) {
-            const contentDiv = detailsElement.querySelector('.song-list');
-            if (detailsElement.open && contentDiv.getAttribute('data-loaded') !== 'true') {
-
-                fetch(`/get_songs/${encodeURIComponent(artistName)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.tracks === -1 || data.tracks.length === 0) {
-                            contentDiv.innerHTML = "<em>No tracks found.</em>";
-                        } else {
-                            let listHtml = "<ul>";
-                            data.tracks.forEach(track => {
-                                listHtml += `<li>${track}</li>`;
-                            });
-                            listHtml += "</ul>";
-                            contentDiv.innerHTML = listHtml;
-                        }
-                        contentDiv.setAttribute('data-loaded', 'true');
-                    })
-                    .catch(err => {
-                        contentDiv.innerHTML = "Error loading songs.";
-                        console.error(err);
-                    });
-            }
-        }
-    </script>
 </body>
 
 </html>
