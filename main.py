@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 
 
 from get_songlist import get_artist_list
+from ai_utils import extract_lineup_with_ai
 
 app = Flask(__name__)
 
@@ -88,6 +89,16 @@ def get_songs(artist_name):
     return jsonify({"artist": artist_name, "tracks": tracks})
 
 
+# Use Gemini to scrape lineup from given URL
+@app.route('/scrape', methods=['POST'])
+def scrape_from_url():
+    url = request.form.get('lineup_url')
+    if not url:
+        return redirect(url_for('home'))
+    
+    artists = extract_lineup_with_ai(url)
+
+    return render_template('index.html', artists=artists, url=url)
 
 if __name__ == '__main__':
     app.run(debug=True)

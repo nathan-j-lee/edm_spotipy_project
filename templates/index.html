@@ -16,10 +16,13 @@
             margin: auto;
         }
 
+        /* ADDED: Styling for the URL section to match the upload section */
+        .url-section,
         .upload-section {
             background: #f4f4f4;
             padding: 20px;
             border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         ul {
@@ -96,13 +99,24 @@
 </head>
 
 <body>
+
     <div id="loading-overlay">
         <div class="spinner"></div>
         <h2>Fetching Lineup Data...</h2>
         <p>This may take a minute depending on the number of artists.</p>
     </div>
+
     <div class="container">
         <h1>EDM Lineup Parser</h1>
+
+        <div class="url-section">
+            <h3>Input Lineup URL</h3>
+            <form action="/scrape" method="post" id="scrape-form">
+                <input type="url" name="lineup_url" placeholder="https://festival-site.com/lineup" required
+                    style="width: 70%;">
+                <button type="submit">Scrape with Gemini</button>
+            </form>
+        </div>
 
         <div class="upload-section">
             <h3>Upload Artist List (.txt)</h3>
@@ -126,17 +140,22 @@
         {% endfor %}
         {% endif %}
     </div>
-    <script>
-        // Show the loading screen when the form is submitted
-        const form = document.getElementById('upload-form');
-        const overlay = document.getElementById('loading-overlay');
 
-        form.addEventListener('submit', function () {
+    <script>
+        const overlay = document.getElementById('loading-overlay');
+        const uploadForm = document.getElementById('upload-form');
+        const scrapeForm = document.getElementById('scrape-form');
+
+        // ADDED: Listener for the Scrape form
+        scrapeForm.addEventListener('submit', function () {
+            overlay.style.display = 'block';
+        });
+
+        uploadForm.addEventListener('submit', function () {
             overlay.style.display = 'block';
         });
 
         function fetchSongs(detailsElement, artistName) {
-            // Only fetch if the dropdown is OPEN and hasn't been loaded yet
             const contentDiv = detailsElement.querySelector('.song-list');
             if (detailsElement.open && contentDiv.getAttribute('data-loaded') !== 'true') {
 
