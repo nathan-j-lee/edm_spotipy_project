@@ -3,5 +3,5 @@ Use spotipy to look up the top 5 popular songs of edm artists from a list of art
 
 
 ## TODO
-- Filter list of artists by genre/popularity/name
+- Add scheduling option? (need to figure this out before coding)
 - Deploy server live
